@@ -83,7 +83,7 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.length;//слушатель будет увеличивать индекс
-                mIsCheater = false;
+//                mIsCheater = false;
                 updateQuestion();//и обновляем текст TextView.
             }
         });
