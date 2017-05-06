@@ -16,6 +16,7 @@ import android.widget.Toast;
 public class QuizActivity extends AppCompatActivity {
     private static final String TAG = "QuizActivity";//константа для отладки
     private static final String KEY_INDEX = "index";//константа, которая станет ключом в сохраняемой паре «ключ-значение» для сохранения
+    private static final String KEY_IS_CHEATER = "IsCheater";
     private static final int REQUEST_CODE_CHEAT = 0;
 
     private Button mTrueButton; //объявление переменных
@@ -36,42 +37,13 @@ public class QuizActivity extends AppCompatActivity {
     private int mCurrentIndex = 0;//переменнаю для индекса массива.
     private boolean mIsCheater;
 
-    private void updateQuestion(){//выделяем этот код в закрытый метод, т.к. Обновление переменной mQuestionTextView осуществляется в двух разных местах.
-//        Log.d(TAG, "Updating question text for question #" + mCurrentIndex,
-//                new Exception());
-        //Первый параметр определяет источник сообщения, а второй — его содержимое.
-        //Первая строка обычно содержит константу TAG, значением которой является имя класса.
-        int question = mQuestionBank[mCurrentIndex].getTextResId();//задания тексту виджета вопроса с текущим индексом.
-        mQuestionTextView.setText(question);
-    }
-
-    private void checkAnswer(boolean userPressedTrue) {//Метод получает логическую переменную,
-        boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();//которая указывает, какую кнопку нажал пользователь: True или False.
-        int messageResId = 0;
-
-        if (mIsCheater) {
-            messageResId = R.string.judgment_toast;
-        } else {
-            if (userPressedTrue == answerIsTrue) {//Ответ пользователя проверяется по ответу текущего объекта Question
-                messageResId = R.string.correct_toast;//после определения правильности ответа метод создает уведомление для вывода соответствующего сообщения
-            } else {
-                messageResId = R.string.incorrect_toast;
-            }
-        }
-        Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();//Уведомление создается вызовом следующего метода,
-        // параметри(Context обычно содержит экземпляр Activity,
-        // идентификатор ресурса строки, которая должна выводиться в уведомлении,
-        // обычно содержит одну из двух констант Toast, определяющих продолжительность пребывания уведомления на экране)
-        // .show(), чтобы уведомление появилось на экране.
-    }
-
     @Override
-    protected void onCreate (Bundle savedInstanceState) {//Метод вызывается при создании экземпляра субкласса активности.
+    protected void onCreate(Bundle savedInstanceState) {//Метод вызывается при создании экземпляра субкласса активности.
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate(Bundle) called");
         setContentView(R.layout.activity_quiz); //предоставить классу активности его пользовательский интерфейс
 
-        mQuestionTextView = (TextView)findViewById(R.id.question_text_view);//получения ссылки на TextView
+        mQuestionTextView = (TextView) findViewById(R.id.question_text_view);//получения ссылки на TextView
         mQuestionTextView.setOnClickListener(new View.OnClickListener() {//Добавление слушателя тексту переключения вопроса
             @Override
             public void onClick(View v) {
@@ -82,7 +54,8 @@ public class QuizActivity extends AppCompatActivity {
 
         mTrueButton = (Button) findViewById(R.id.true_button); // Получение ссылок на виджеты, возвращенный объект View перед присваиванием необходимо преобразовать в Button.
         mTrueButton.setOnClickListener(new View.OnClickListener() { //Назначение слушателя для кнопки True, получает в аргументе слушателя, а конкретнее — объект, реализующий OnClickListener.
-            @Override                                               //В круглых скобках создается новый безымянный класс, вся реализация которого передается вызываемому методу.
+            @Override
+            //В круглых скобках создается новый безымянный класс, вся реализация которого передается вызываемому методу.
             public void onClick(View v) {
                 checkAnswer(true);
             }
@@ -115,7 +88,7 @@ public class QuizActivity extends AppCompatActivity {
             }
         });
 
-        mCheatButton = (Button)findViewById(R.id.cheat_button);//получение ссылки на кнопку перехода в CheatActivity
+        mCheatButton = (Button) findViewById(R.id.cheat_button);//получение ссылки на кнопку перехода в CheatActivity
         mCheatButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -128,14 +101,38 @@ public class QuizActivity extends AppCompatActivity {
 
         if (savedInstanceState != null) {//проверяем это значение, и если оно присутствует, присвоить его mCurrentIndex.(повороты экрана)
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
+            mIsCheater = savedInstanceState.getBoolean(KEY_IS_CHEATER);
         }
 
         updateQuestion();
 
     }
 
+    private void updateQuestion() {//выделяем этот код в закрытый метод, т.к. Обновление переменной mQuestionTextView осуществляется в двух разных местах.
+//        Log.d(TAG, "Updating question text for question #" + mCurrentIndex, new Exception());
+
+        int question = mQuestionBank[mCurrentIndex].getTextResId();//задания тексту виджета вопроса с текущим индексом.
+        mQuestionTextView.setText(question);
+    }
+
+    private void checkAnswer(boolean userPressedTrue) {//Метод получает логическую переменную,
+        boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();//которая указывает, какую кнопку нажал пользователь: True или False.
+        int messageResId = 0;
+
+        if (mIsCheater) {
+            messageResId = R.string.judgment_toast;
+        } else {
+            if (userPressedTrue == answerIsTrue) {//Ответ пользователя проверяется по ответу текущего объекта Question
+                messageResId = R.string.correct_toast;//после определения правильности ответа метод создает уведомление для вывода соответствующего сообщения
+            } else {
+                messageResId = R.string.incorrect_toast;
+            }
+        }
+        Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
+    }
+
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent  data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != Activity.RESULT_OK) {
             return;
         }
@@ -152,6 +149,7 @@ public class QuizActivity extends AppCompatActivity {
         super.onSaveInstanceState(savedInstanceState);
         Log.i(TAG, "onSaveInstanceState");
         savedInstanceState.putInt(KEY_INDEX, mCurrentIndex);//запись значения mCurrentIndex в Bundle с использованием константы в качестве ключа.
+        savedInstanceState.putBoolean(KEY_IS_CHEATER, mIsCheater);
     }
 
     @Override  //переопределим пять методов жизненного цикла Activity
@@ -159,21 +157,25 @@ public class QuizActivity extends AppCompatActivity {
         super.onStart();
         Log.d(TAG, "onStart() called");
     }
+
     @Override
     public void onPause() {
         super.onPause();
         Log.d(TAG, "onPause() called");
     }
+
     @Override
     public void onResume() {
         super.onResume();
         Log.d(TAG, "onResume() called");
     }
+
     @Override
     public void onStop() {
         super.onStop();
         Log.d(TAG, "onStop() called");
     }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
