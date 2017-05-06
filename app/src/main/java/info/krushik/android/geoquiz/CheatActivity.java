@@ -48,9 +48,8 @@ public class CheatActivity extends AppCompatActivity {
         mShowAnswer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mIsAnswerShown = true;
                 showAnswer();
-
-
 
 //                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) { //Предварительная проверка версии Android на устройстве
 //                    //создания круговой анимации на время сокрытия кнопки CHEAT
@@ -76,7 +75,9 @@ public class CheatActivity extends AppCompatActivity {
 
         if (savedInstanceState != null) {
             mIsAnswerShown = savedInstanceState.getBoolean(KEY_ANSWER_SHOWN);
-            showAnswer();
+            if (mIsAnswerShown) {
+                showAnswer();
+            }
         }
 
     }
@@ -87,8 +88,6 @@ public class CheatActivity extends AppCompatActivity {
         } else {
             mAnswerTextView.setText(R.string.false_button);
         }
-
-        mIsAnswerShown = true;
         setAnswerShownResult(mIsAnswerShown);
     }
 
