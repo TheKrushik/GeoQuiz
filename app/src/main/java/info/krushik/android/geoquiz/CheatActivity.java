@@ -24,6 +24,7 @@ public class CheatActivity extends AppCompatActivity {
     private boolean mIsAnswerShown;
 
     private TextView mAnswerTextView;
+    private TextView mApiTextView;
     private Button mShowAnswer;
 
     public static Intent newIntent(Context packageContext, boolean answerIsTrue) {
@@ -44,6 +45,9 @@ public class CheatActivity extends AppCompatActivity {
         mAnswerIsTrue = getIntent().getBooleanExtra(EXTRA_ANSWER_IS_TRUE, false);
 
         mAnswerTextView = (TextView)findViewById(R.id.answer_text_view);
+        mApiTextView = (TextView)findViewById(R.id.api_text_view);
+//        mApiTextView.setText(getString(R.string.api_level) + " " + Build.VERSION.SDK_INT);
+        mApiTextView.append(" " + Build.VERSION.SDK_INT);
         mShowAnswer = (Button) findViewById(R.id.show_answer_button);
         mShowAnswer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,25 +55,25 @@ public class CheatActivity extends AppCompatActivity {
                 mIsAnswerShown = true;
                 showAnswer();
 
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) { //Предварительная проверка версии Android на устройстве
-//                    //создания круговой анимации на время сокрытия кнопки CHEAT
-//                    int cx = mShowAnswer.getWidth() / 2;
-//                    int cy = mShowAnswer.getHeight() / 2;
-//                    float radius = mShowAnswer.getWidth();
-//                        Animator anim = ViewAnimationUtils.createCircularReveal(mShowAnswer, cx, cy, radius, 0);
-//                    anim.addListener(new AnimatorListenerAdapter() {
-//                        @Override
-//                        public void onAnimationEnd(Animator animation) {
-//                            super.onAnimationEnd(animation);
-//                            mAnswerTextView.setVisibility(View.VISIBLE);
-//                            mShowAnswer.setVisibility(View.INVISIBLE);
-//                        }
-//                    });
-//                    anim.start();
-//                } else { // если версия ниже LOLLIPOP, анимации не будет
-//                    mAnswerTextView.setVisibility(View.VISIBLE);//пропадает кнопка
-//                    mShowAnswer.setVisibility(View.INVISIBLE);//появляется ответ
-//                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) { //Предварительная проверка версии Android на устройстве
+                    //создания круговой анимации на время сокрытия кнопки CHEAT
+                    int cx = mShowAnswer.getWidth() / 2;
+                    int cy = mShowAnswer.getHeight() / 2;
+                    float radius = mShowAnswer.getWidth();
+                        Animator anim = ViewAnimationUtils.createCircularReveal(mShowAnswer, cx, cy, radius, 0);
+                    anim.addListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            mAnswerTextView.setVisibility(View.VISIBLE);
+                            mShowAnswer.setVisibility(View.INVISIBLE);
+                        }
+                    });
+                    anim.start();
+                } else { // если версия ниже LOLLIPOP, анимации не будет
+                    mAnswerTextView.setVisibility(View.VISIBLE);//пропадает кнопка
+                    mShowAnswer.setVisibility(View.INVISIBLE);//появляется ответ
+                }
             }
         });
 
@@ -77,6 +81,8 @@ public class CheatActivity extends AppCompatActivity {
             mIsAnswerShown = savedInstanceState.getBoolean(KEY_ANSWER_SHOWN);
             if (mIsAnswerShown) {
                 showAnswer();
+                mAnswerTextView.setVisibility(View.VISIBLE);//пропадает кнопка
+                mShowAnswer.setVisibility(View.INVISIBLE);//появляется ответ
             }
         }
 
